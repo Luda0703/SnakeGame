@@ -8,6 +8,7 @@
 
 .text {
   color: #fff;
+  text-shadow: 2px 2px 2px #000;
 }
 
 .gameBord {
@@ -32,4 +33,18 @@
   color: azure;
   top: 35%;
   left: 25%;
+  text-shadow: 2px 2px 2px #000;
+}
+
+.App section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  color: #FFF;
+}
+
+.App section p {
+  font-size: 20px;
+  text-shadow: 2px 2px 2px #000;
 }

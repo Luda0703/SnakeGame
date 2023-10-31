@@ -13,6 +13,9 @@ function App() {
     { x: 0, y: 0 },
   ]);
 
+  const [level, setLevel] = useState(1);
+  const [speed, setSpeed] = useState(0);
+
   const generateFood = () => {
     const x = Math.floor(Math.random() * BOARD_LENGTH);
     const y = Math.floor(Math.random() * BOARD_LENGTH);
@@ -82,15 +85,21 @@ function App() {
   }, [snake, direction]);
 
   useEffect(() => {
-    const moveInterval = setInterval(snakeMoveHandler, 200);
+    const moveInterval = setInterval(snakeMoveHandler, 700 - level * 50);
     return () => {
       clearInterval(moveInterval);
     };
-  }, [snakeMoveHandler]);
+  }, [snakeMoveHandler, level]);
 
   useEffect(() => {
     if (snake[0].x === food.x && snake[0].y === food.y) {
       setFood(generateFood());
+      setSpeed((prev) => (prev += 10));
+      if (speed % 50) {
+        if (level <= 13) {
+          setLevel((prev) => (prev += 1));
+        }
+      }
       const newSnake = [...snake];
       const tail = { ...newSnake[newSnake.length - 1] };
       newSnake.push(tail);
@@ -102,7 +111,7 @@ function App() {
         setGameOver(true);
       }
     }
-  }, [food, snake]);
+  }, [food, snake, speed, level]);
 
   useEffect(() => {
     document.addEventListener("keydown", pressKeyHangler);
@@ -114,6 +123,10 @@ function App() {
   return (
     <div className="App">
       <h1 className="text">SNAKE GAME</h1>
+      <section>
+        <p className="level-speed">LEVEL: {level}</p>
+        <p className="level-speed">SPEED: {speed}</p>
+      </section>
       <div className="gameBord">
         {!gameOver ? (
           <Food x={food.x} y={food.y} />
