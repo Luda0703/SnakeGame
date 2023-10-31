@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import Food from "./components/Food/Food";
+import MouseController from "./components/MouseController/MouseController";
 import Snake from "./components/Snake/Snake";
 import { ISnake } from "./interfases/ISnake";
 
@@ -112,15 +113,26 @@ function App() {
     if (snake[0].x === food.x && snake[0].y === food.y) {
       setFood(generateFood());
       setSpeed((prev) => (prev += 10));
-      if (speed % 50) {
-        if (level <= 13) {
+      if (snake.length % 5 === 0) {
+        if (level < 13) {
           setLevel((prev) => (prev += 1));
+          setDirection("right");
+          setSnake([
+            { x: 1, y: 0 },
+            { x: 0, y: 0 },
+          ]);
+        } else {
+          const newSnake = [...snake];
+          const tail = { ...newSnake[newSnake.length - 1] };
+          newSnake.push(tail);
+          setSnake(newSnake);
         }
+      } else {
+        const newSnake = [...snake];
+        const tail = { ...newSnake[newSnake.length - 1] };
+        newSnake.push(tail);
+        setSnake(newSnake);
       }
-      const newSnake = [...snake];
-      const tail = { ...newSnake[newSnake.length - 1] };
-      newSnake.push(tail);
-      setSnake(newSnake);
     }
 
     for (let i = 1; i < snake.length; i++) {
@@ -151,45 +163,48 @@ function App() {
   }, [totalSpeed]);
 
   return (
-    <div className="App">
-      <h1 className="text">SNAKE GAME</h1>
-      <section>
-        <p className="level-speed">LEVEL: {level}</p>
-        <p className="level-speed">SPEED: {speed}</p>
-      </section>
-      {!isGame ? (
-        <div className="startBoard">
-          <p className="text-start">PRESS START TO PLAY</p>
-          <button onClick={startGameHangler}>START</button>
-          <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
-        </div>
-      ) : (
-        <div className="gameBord">
-          {!gameOver ? (
-            <Food x={food.x} y={food.y} />
-          ) : (
-            <div className="gameOverBoard">
-              <h2 className="game-over">GAME OVER</h2>
-              <p className="text-start">PRESS START TO PLAY</p>
-              <button onClick={startGameHangler}>START</button>
+    <>
+      <div className="App">
+        <h1 className="text">SNAKE GAME</h1>
+        <section>
+          <p className="level-speed">LEVEL: {level}</p>
+          <p className="level-speed">SPEED: {speed}</p>
+        </section>
+        {!isGame ? (
+          <div className="startBoard">
+            <p className="text-start">PRESS START TO PLAY</p>
+            <button onClick={startGameHangler}>START</button>
+            <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
+          </div>
+        ) : (
+          <div className="gameBord">
+            {!gameOver ? (
+              <Food x={food.x} y={food.y} />
+            ) : (
+              <div className="gameOverBoard">
+                <h2 className="game-over">GAME OVER</h2>
+                <p className="text-start">PRESS START TO PLAY</p>
+                <button onClick={startGameHangler}>START</button>
 
-              <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
-            </div>
-          )}
-          {!gameOver &&
-            Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
-              <div key={i} className="item">
-                {snake.some((element) => isSnakeChack(element, i)) && (
-                  <Snake
-                    isHead={isSnakeChack(snake[0], i)}
-                    direction={direction}
-                  />
-                )}
+                <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
               </div>
-            ))}
-        </div>
-      )}
-    </div>
+            )}
+            {!gameOver &&
+              Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
+                <div key={i} className="item">
+                  {snake.some((element) => isSnakeChack(element, i)) && (
+                    <Snake
+                      isHead={isSnakeChack(snake[0], i)}
+                      direction={direction}
+                    />
+                  )}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+      <MouseController direction={direction} setDirection={setDirection} />
+    </>
   );
 }
 
