@@ -1,0 +1,27 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.text {
+  color: #fff;
+}
+
+.gameBord {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  min-width: 320px;
+  min-height: 320px;
+  background-color:darkgrey;
+}
+
+.item {
+  width: 32px;
+  height: 32px;
+  background-color: #FFF;
+  border: 1px solid rgb(175, 175, 175);
+  box-sizing: border-box;
+}

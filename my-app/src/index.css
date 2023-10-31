@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+ display: flex;
+ place-items: center;
+ min-width: 320px;
+ min-height: 100vh;
+ align-items: flex-start;
+ justify-content: center;
+  background-color: dimgray;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
