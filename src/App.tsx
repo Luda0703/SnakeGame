@@ -2,13 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import Food from "./components/Food/Food";
 import Snake from "./components/Snake/Snake";
+import { ISnake } from "./interfases/ISnake";
 
 function App() {
   const BOARD_LENGTH = 10;
   const [direction, setDirection] = useState("right");
-  const [snake, setSnake] = useState([
-    // { x: 3, y: 0 },
-    // { x: 2, y: 0 },
+  const [snake, setSnake] = useState<ISnake[]>([
     { x: 1, y: 0 },
     { x: 0, y: 0 },
   ]);
@@ -36,6 +35,12 @@ function App() {
       { x: 0, y: 0 },
     ]);
     setIsGame(true);
+  };
+
+  const isSnakeChack = (element: ISnake, index: number) => {
+    const x = index % BOARD_LENGTH;
+    const y = Math.floor(index / BOARD_LENGTH);
+    return element.x === x && element.y === y;
   };
 
   const pressKeyHangler = useCallback(
@@ -174,11 +179,12 @@ function App() {
           {!gameOver &&
             Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
               <div key={i} className="item">
-                {snake.some(
-                  (element) =>
-                    element.x === i % BOARD_LENGTH &&
-                    element.y === Math.floor(i / BOARD_LENGTH)
-                ) && <Snake />}
+                {snake.some((element) => isSnakeChack(element, i)) && (
+                  <Snake
+                    isHead={isSnakeChack(snake[0], i)}
+                    direction={direction}
+                  />
+                )}
               </div>
             ))}
         </div>
