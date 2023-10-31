@@ -7,24 +7,36 @@ function App() {
   const BOARD_LENGTH = 10;
   const [direction, setDirection] = useState("right");
   const [snake, setSnake] = useState([
-    { x: 3, y: 0 },
-    { x: 2, y: 0 },
+    // { x: 3, y: 0 },
+    // { x: 2, y: 0 },
     { x: 1, y: 0 },
     { x: 0, y: 0 },
   ]);
 
   const [level, setLevel] = useState(1);
   const [speed, setSpeed] = useState(0);
-
+  const [totalSpeed, setTotalSpeed] = useState(0);
   const generateFood = () => {
     const x = Math.floor(Math.random() * BOARD_LENGTH);
     const y = Math.floor(Math.random() * BOARD_LENGTH);
     return { x, y };
   };
-
   const [gameOver, setGameOver] = useState(false);
-
   const [food, setFood] = useState(generateFood);
+  const [isGame, setIsGame] = useState(false);
+
+  const startGameHangler = () => {
+    setLevel(1);
+    setSpeed(0);
+    setGameOver(false);
+    setFood(generateFood);
+    setDirection("right");
+    setSnake([
+      { x: 1, y: 0 },
+      { x: 0, y: 0 },
+    ]);
+    setIsGame(true);
+  };
 
   const pressKeyHangler = useCallback(
     (e: KeyboardEvent) => {
@@ -109,9 +121,13 @@ function App() {
     for (let i = 1; i < snake.length; i++) {
       if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
         setGameOver(true);
+        if (totalSpeed < speed) {
+          localStorage.setItem("totalSpeed", JSON.stringify(speed));
+          setTotalSpeed(speed);
+        }
       }
     }
-  }, [food, snake, speed, level]);
+  }, [food, snake, speed, level, totalSpeed]);
 
   useEffect(() => {
     document.addEventListener("keydown", pressKeyHangler);
@@ -120,6 +136,15 @@ function App() {
     };
   }, [pressKeyHangler]);
 
+  useEffect(() => {
+    const newTotalSpeed = localStorage.getItem("totalSpeed");
+    if (!newTotalSpeed) {
+      localStorage.setItem("totalSpeed", JSON.stringify(0));
+    } else {
+      setTotalSpeed(Number(newTotalSpeed));
+    }
+  }, [totalSpeed]);
+
   return (
     <div className="App">
       <h1 className="text">SNAKE GAME</h1>
@@ -127,23 +152,37 @@ function App() {
         <p className="level-speed">LEVEL: {level}</p>
         <p className="level-speed">SPEED: {speed}</p>
       </section>
-      <div className="gameBord">
-        {!gameOver ? (
-          <Food x={food.x} y={food.y} />
-        ) : (
-          <h2 className="game-over">GAME OVER</h2>
-        )}
-        {!gameOver &&
-          Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
-            <div key={i} className="item">
-              {snake.some(
-                (element) =>
-                  element.x === i % BOARD_LENGTH &&
-                  element.y === Math.floor(i / BOARD_LENGTH)
-              ) && <Snake />}
+      {!isGame ? (
+        <div className="startBoard">
+          <p className="text-start">PRESS START TO PLAY</p>
+          <button onClick={startGameHangler}>START</button>
+          <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
+        </div>
+      ) : (
+        <div className="gameBord">
+          {!gameOver ? (
+            <Food x={food.x} y={food.y} />
+          ) : (
+            <div className="gameOverBoard">
+              <h2 className="game-over">GAME OVER</h2>
+              <p className="text-start">PRESS START TO PLAY</p>
+              <button onClick={startGameHangler}>START</button>
+
+              <p className="text-start">TOTAL SPEED: {totalSpeed}</p>
             </div>
-          ))}
-      </div>
+          )}
+          {!gameOver &&
+            Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
+              <div key={i} className="item">
+                {snake.some(
+                  (element) =>
+                    element.x === i % BOARD_LENGTH &&
+                    element.y === Math.floor(i / BOARD_LENGTH)
+                ) && <Snake />}
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
