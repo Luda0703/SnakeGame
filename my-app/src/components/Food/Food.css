@@ -1,0 +1,7 @@
+.food {
+    width: 32px;
+    height: 32px;
+    background: url('../../../public/images/apple.png') center / cover no-repeat;
+    position: absolute;
+    
+}

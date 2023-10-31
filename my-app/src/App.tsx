@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
+import Food from "./components/Food/Food";
 import Snake from "./components/Snake/Snake";
 
 function App() {
@@ -12,24 +13,45 @@ function App() {
     { x: 0, y: 0 },
   ]);
 
-  const pressKeyHangler = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case "ArrowRight":
-        setDirection("right");
-        break;
-      case "ArrowLeft":
-        setDirection("left");
-        break;
-      case "ArrowUp":
-        setDirection("up");
-        break;
-      case "ArrowDown":
-        setDirection("down");
-        break;
-      default:
-        break;
-    }
-  }, []);
+  const generateFood = () => {
+    const x = Math.floor(Math.random() * BOARD_LENGTH);
+    const y = Math.floor(Math.random() * BOARD_LENGTH);
+    return { x, y };
+  };
+
+  const [gameOver, setGameOver] = useState(false);
+
+  const [food, setFood] = useState(generateFood);
+
+  const pressKeyHangler = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowRight":
+          if (direction !== "left") {
+            setDirection("right");
+          }
+          break;
+        case "ArrowLeft":
+          if (direction !== "right") {
+            setDirection("left");
+          }
+          break;
+        case "ArrowUp":
+          if (direction !== "down") {
+            setDirection("up");
+          }
+          break;
+        case "ArrowDown":
+          if (direction !== "up") {
+            setDirection("down");
+          }
+          break;
+        default:
+          break;
+      }
+    },
+    [direction]
+  );
 
   const snakeMoveHandler = useCallback(() => {
     const newSnake = [...snake];
@@ -67,6 +89,22 @@ function App() {
   }, [snakeMoveHandler]);
 
   useEffect(() => {
+    if (snake[0].x === food.x && snake[0].y === food.y) {
+      setFood(generateFood());
+      const newSnake = [...snake];
+      const tail = { ...newSnake[newSnake.length - 1] };
+      newSnake.push(tail);
+      setSnake(newSnake);
+    }
+
+    for (let i = 1; i < snake.length; i++) {
+      if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
+        setGameOver(true);
+      }
+    }
+  }, [food, snake]);
+
+  useEffect(() => {
     document.addEventListener("keydown", pressKeyHangler);
     return () => {
       document.removeEventListener("keydown", pressKeyHangler);
@@ -77,15 +115,21 @@ function App() {
     <div className="App">
       <h1 className="text">SNAKE GAME</h1>
       <div className="gameBord">
-        {Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
-          <div key={i} className="item">
-            {snake.some(
-              (element) =>
-                element.x === i % BOARD_LENGTH &&
-                element.y === Math.floor(i / BOARD_LENGTH)
-            ) && <Snake />}
-          </div>
-        ))}
+        {!gameOver ? (
+          <Food x={food.x} y={food.y} />
+        ) : (
+          <h2 className="game-over">GAME OVER</h2>
+        )}
+        {!gameOver &&
+          Array.from({ length: BOARD_LENGTH * BOARD_LENGTH }, (_, i) => (
+            <div key={i} className="item">
+              {snake.some(
+                (element) =>
+                  element.x === i % BOARD_LENGTH &&
+                  element.y === Math.floor(i / BOARD_LENGTH)
+              ) && <Snake />}
+            </div>
+          ))}
       </div>
     </div>
   );

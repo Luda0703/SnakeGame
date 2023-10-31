@@ -16,6 +16,7 @@
   min-width: 320px;
   min-height: 320px;
   background-color:darkgrey;
+  position: relative;
 }
 
 .item {
@@ -24,4 +25,11 @@
   background-color: #FFF;
   border: 1px solid rgb(175, 175, 175);
   box-sizing: border-box;
+}
+
+.game-over {
+  position: absolute;
+  color: azure;
+  top: 35%;
+  left: 25%;
 }
